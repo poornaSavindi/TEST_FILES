@@ -1,0 +1,119 @@
+first we made separate files for each page like addjoke.php, updatejoke.php
+Divided them into individual files and included them
+then made generic functions for adding, updating … and inserted them inside a separate file
+added a separate controller, hence added single entry point using index.php.direction of pages using URL parameters.
+eg: index.php?action=Edit
+trying to make the code more and more generic...…
+creating another controller for user registration as RegisterController.php. this arouses the need for having another index.php
+as the interface for user registration which causes code repetition.
+WE HAVE TO COME WITH A SOLUTION where the controller is specified in the URL parameter.eg: controller=joke&sction=list
+this would not be much secure. therefore lets use the route variable to access the cntroller and action like this.
+eg:index.php?route=joke/list
+****************************************
+REFER URL REWRITING IN XAAMP SERVER
+****************************************
+php -S localhost:8080-------------->>> will start the php development server in the prefered folder. dont forget to navigate to the right folder where
+                                      your index.php is...
+
+then your URL will be like ----->>>localhost:8080/joke/list
+-----------------------------
+made index.php more simple by creating the EntryPoint class and moving all the code inside it
+-----------------------------
+implemented AutoLoader.php and included autoloading function init.
+separated project specific and framework code.
+framework code in Ninja and others in Ijdb
+===================================nameSpace==================
+namespace Ninja;
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+now our callaction method have the following if-else structure.
+/*
+if ($route === 'joke/list') {
+  $controller = new \Ijdb\controllers\Joke($jokesTable,$authorsTable);
+  $page = $controller->list();
+
+} elseif ($route === '') {
+  $controller = new  \Ijdb\controllers\Joke($jokesTable,$authorsTable);
+  $page = $controller->home();
+
+} elseif ($route === 'joke/edit') {
+  $controller = new  \Ijdb\controllers\Joke($jokesTable,$authorsTable);
+  $page = $controller->edit();
+
+} elseif ($route === 'joke/delete') {
+  $controller = new  \Ijdb\controllers\Joke($jokesTable,$authorsTable);
+  $page = $controller->delete();
+
+} elseif ($route === 'register') {
+  include __DIR__ .'/controllers/RegisterController.php';
+  $controller = new RegisterController($authorsTable);
+  $page = $controller->showForm();
+  */
+
+  but we can get rid of this using REST methods.
+  update
+  ------
+  *url-joke/edit?id=11
+  *the particular entry with the above id is selected and edit.html.php is loaded.
+  *then the submitted values are again directed to the edit method.
+  *update method will be called through save method.(when the existing id error is aroused)
+
+  insert
+  ------
+  *url-joke/Edit
+  *neither id or joke fields of $_GET variable is not set
+  *therefore edit.html.php is called
+  *then submitted values are directed to the edit method in $_POST variables
+  *insert method is called.
+
+  so, as declared above GET is used to request pages on the website and POST to submit forms.
+  So edit do two operations depending on the method(GET or POST).
+  this is known as REST and this method is given in $_SERVER['REQUEST_METHOD']
+  ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+  allowing user Registration
+  --------------------------
+
+  because we have the full framework,
+      we just have to,
+            *set routes in IJDBRoutes for author/register and author/success.
+            *create a controller class(Register.php) with methods for registering and display form and success page.
+            *create html file for form.
+
+  now we have to do some error checking.
+  *all the fields should contain some data.
+  *email should be a real email address.
+  *it should not already belong to an account.
+
+
+  >>>>>configuring email using - filter_var function.
+  ==================================================================================================================
+
+  creating the authentication class with two methods.
+
+  there are some pages which are needed to be protected.
+          eg: list of jokes should be visible to all users but ability to add, remove, edit should not be eligible to all.
+  to acheive this we can call isLoggedIN method in each edit/delete methods. But this becomes repeating codes.
+  Therefore add an extra name-value pair to the routes called 'login'=true.
+
+
+  add a new method to IJDBRoutes class called getAuthentication which return an instance of a Authentication object.
+
+  in entrypoint class check whether the user is loggedin before calling any action.
+
+  to print an error msg, you need to have a different page for displaying that. becuase there are several other functionalities
+  associated with login, lets create a different controller for that which will include a method for displaying the logging form
+  and displaying the error page.
+
+
+  set routes for login and success and make relevant methods in login.php-the controller
+
+
+
+for logging out, u should *****************destroy the session using session_destroy()*******************************
+========================================================================================================================
+next, for saving the jokes with the authorid of each user, we need to have the id with us all the time.
+for that add a getUser function to Authentication.php and add an instance of authentication class to the constructor of controllers.
+=========================================================================================================================
+at this moment anyone can delete jokes and edit them.
+
+therefore in jokes.html.php before displaying delete and edit buttons check whether the joke is added by the current logged in user.

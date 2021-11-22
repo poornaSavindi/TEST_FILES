@@ -1,0 +1,33 @@
+body{
+  padding:10px;
+}
+
+#floatingTextarea{
+  margin: 0.8%;
+}
+#submit-button{
+  display: inline;
+  position: relative;
+  float: right;
+  width: 100px;
+  margin: 25px 0px 200px 1100px;
+}
+.img-thumbnail{
+  margin:5px 50px 5px 350px;
+  height: 480px;
+  width: 350px;
+}
+header{
+  margin-left: 350px;
+  padding: 5px;
+}
+#textarea{
+  margin:10px 10px 10px 0px;
+
+}
+.errors{
+  background-color: black;
+  color: red;
+  text-decoration: none;
+
+}
